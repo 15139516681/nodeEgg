@@ -1,35 +1,53 @@
+
 const Controller = require('egg').Controller;
-
-
 class UserController extends Controller {
-    async list() {
-        const { ctx } = this;
-        const userList = await ctx.service.user.searchAll();
-        ctx.body = {
-            success: true,
-            data: userList
-        }
-    }
-
     // 登录接口
     async login() {
-        const { ctx } = this;
+        const { ctx, app } = this;
         const data = ctx.request.body;
-        console.log('打印', data);
         const resoult = await ctx.service.user.login(data);
-        console.log('打印resoult', resoult)
-        if (resoult) {
+        // 生成token
+        const token = app.jwt.sign({ user: data.user }, app.config.jwt.secret, { expiresIn: 60 * 60 * 24 })
+        if (resoult.code == 200) {
             ctx.body = {
-                success: true,
-                msg: '登录成功'
+                code: 200,
+                msg: 'success',
+                token,
             }
         } else {
             ctx.body = {
-                success: false,
-                msg: '登录失败'
+                code: 400,
+                msg: 'error',
             }
         }
     }
+    // 注册接口
+    async register() {
+        const { ctx } = this;
+        const data = ctx.request.body;
+        const resoult = await ctx.service.user.register(data);
+        if (resoult) {
+            ctx.body = {
+                code: 200,
+                msg: '注册成功'
+            }
+        } else {
+            ctx.body = {
+                code: 400,
+                msg: '注册失败'
+            }
+        }
+    }
+
+    async testToken() {
+        const { ctx } = this;
+        const data = ctx.request.body;
+        ctx.body = {
+            code: 200,
+            data,
+        }
+    }
+
 
 }
 module.exports = UserController;

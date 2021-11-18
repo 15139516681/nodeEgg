@@ -33,7 +33,26 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_123456';
 
   // add your middleware config here
-  config.middleware = ['auth'];
+  config.middleware = [];
+
+  // 生成token
+  config.jwt = {
+    secret: '123456'
+  }
+
+  config.security = {
+    csrf: {
+      enable: false,
+      ignoreJSON: true
+    },
+    domainWhiteList: ['http://localhost:8080']
+  };
+
+  // 跨域配置
+  config.cors = {
+    origin: '*',
+    allowMethods: 'GET, POST'
+  };
 
   // add your user config here
   const userConfig = {
